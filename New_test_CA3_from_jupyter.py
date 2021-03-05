@@ -6,6 +6,7 @@ import datetime
 from bs4 import BeautifulSoup
 import requests
 import pandas as pd
+from pandas import DataFrame
 import re
 
 # Module variables to connect to moodle api:
@@ -86,21 +87,42 @@ courseid = "12"  # Exchange with valid id.
 # Get all sections of the course.
 sec = LocalGetSections(courseid)
 
-moodle_pull_df= pd.DataFrame(columns = ['Link', 'Date','Week_no', 'uploaded']) 
+# moodle_pull_df= pd.DataFrame(columns = ['Link', 'Date','Week_no', 'uploaded']) 
 
-def sections():
+def sections_sum():
+    list = []
     num = 1
     try:
         for num in range(1, 28, num):
-            s= print(json.dumps(sec.getsections[num]['summary'], indent=4, sort_keys=True))
-            month = parser.parse(list(sec.getsections)[num]['name'].split('-')[0])
-            print(month)
-            w =print(month.strftime("%V"))
-            moodle_pull_df = moodle_pull_df.append({'Link' : s, 'Date' : month, 'Week_no' : w},ignore_index = True)
+            list.append(json.dumps(sec.getsections[num]['summary'], indent=4, sort_keys=True))
+            # month = parser.parse(list(sec.getsections)[num]['name'].split('-')[0])
+            # print(month)
+            # print(month.strftime("%V"))
+            # moodle_pull_df = moodle_pull_df.append({'Link' : s, 'Date' : month, 'Week_no' : w},ignore_index = True)
     except:
         print('No section date')
     else:
-        return
+        return list
 
-print(sections())
+def sections_months():
+    list = []
+    num = 1
+    try:
+        for num in range(1, 28, num):
+            list.append(json.dumps(sec.getsections[num]['summary'], indent=4, sort_keys=True))
+            month = parser.parse(list(sec.getsections)[num]['name'].split('-')[0])
+            list.append(month)
+            # print(month.strftime("%V"))
+            # moodle_pull_df = moodle_pull_df.append({'Link' : s, 'Date' : month, 'Week_no' : w},ignore_index = True)
+    except:
+        print('No section date')
+    else:
+        return list
 
+# a = sections_sum()
+b = sections_months()
+from pandas import DataFrame
+
+# df = DataFrame (a,b,columns=['summary_link'],['months'])
+df = DataFrame (b,columns=['months'])
+print(df)
