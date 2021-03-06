@@ -148,9 +148,22 @@ sec = LocalGetSections(courseid)
 #         print(dates)
 
 
+# for section in LocalGetSections(courseid).getsections:
+#     dates = re.findall(r'(\d{1,2} \w{3,})', section['name'])
+#     summary = re.findall(r'(\d{1,2} \w{3,})', section['summary'])
+#     if len(dates) == 2:
+#         print(dates)
+#         print(section['summary'])
+
+
+
+moodle_df= pd.DataFrame()
+
 for section in LocalGetSections(courseid).getsections:
     dates = re.findall(r'(\d{1,2} \w{3,})', section['name'])
     summary = re.findall(r'(\d{1,2} \w{3,})', section['summary'])
     if len(dates) == 2:
-        print(dates)
-        print(section['summary'])
+        moodle_df= moodle_df.append({'Date' : dates, 'Link':section['summary']},ignore_index = True)
+
+
+print(moodle_df)
