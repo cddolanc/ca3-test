@@ -1,9 +1,15 @@
+# pip install bs4
+# pip install pandas
+import bs4
 from requests import get, post
 import json
 from dateutil import parser
 import datetime
 from bs4 import BeautifulSoup
 import requests
+import pandas as pd
+from pandas import DataFrame
+import re
 
 # Module variables to connect to moodle api:
 # Insert token and URL for your site here.
@@ -83,18 +89,18 @@ courseid = "12"  # Exchange with valid id.
 # Get all sections of the course.
 sec = LocalGetSections(courseid)
 
-# Output readable JSON, but print only summary
-print(json.dumps(sec.getsections[2]['summary'], indent=4, sort_keys=True))
-# print(json.dumps(sec.getsections[1]['instancename'], indent=4, sort_keys=True))
-# Split the section name by dash and convert the date into the timestamp, it takes the current year, 
-# so think of a way for making sure it has the correct year!
-month = parser.parse(list(sec.getsections)[2]['name'].split('-')[0])
-# Show the resulting timestamp
-print(month)
-# Extract the week number from the start of the calendar year
-print(month.strftime("%V"))
-# print(sec.getsections)
-print(json.dumps(sec.getsections, indent=4, sort_keys=True))
+# # Output readable JSON, but print only summary
+# print(json.dumps(sec.getsections[2]['summary'], indent=4, sort_keys=True))
+# # print(json.dumps(sec.getsections[1]['instancename'], indent=4, sort_keys=True))
+# # Split the section name by dash and convert the date into the timestamp, it takes the current year, 
+# # so think of a way for making sure it has the correct year!
+# month = parser.parse(list(sec.getsections)[2]['name'].split('-')[0])
+# # Show the resulting timestamp
+# print(month)
+# # Extract the week number from the start of the calendar year
+# print(month.strftime("%V"))
+# # print(sec.getsections)
+# print(json.dumps(sec.getsections, indent=4, sort_keys=True))
 
 # #  Assemble the payload
 # data = [{'type': 'num', 'section': 0, 'summary': '', 'summaryformat': 1, 'visible': 1 , 'highlight': 0, 'sectionformatoptions': [{'name': 'level', 'value': '1'}]}]
@@ -133,3 +139,18 @@ print(json.dumps(sec.getsections, indent=4, sort_keys=True))
 # print(soup)
 
 # print(soup.select('title'))
+
+# for section in LocalGetSections(12).getsections:
+#     dates = re.findall(r'(\d{1,2} \w{3,})', section['name'])
+#     if len(dates) == 2:
+# #         week_start = dates[1]
+# #         week_end = dates[1]
+#         print(dates)
+
+
+for section in LocalGetSections(courseid).getsections:
+    dates = re.findall(r'(\d{1,2} \w{3,})', section['name'])
+    summary = re.findall(r'(\d{1,2} \w{3,})', section['summary'])
+    if len(dates) == 2:
+        print(dates)
+        print(section['summary'])
