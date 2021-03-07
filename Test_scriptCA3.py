@@ -10,6 +10,9 @@ import requests
 import pandas as pd
 from pandas import DataFrame
 import re
+import warnings
+warnings.filterwarnings('ignore') # We can suppress the warnings
+
 
 # Module variables to connect to moodle api:
 # Insert token and URL for your site here.
