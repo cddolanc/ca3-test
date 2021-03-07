@@ -157,7 +157,8 @@ sec = LocalGetSections(courseid)
 
 
 
-moodle_df= pd.DataFrame()
+moodle_df= pd.DataFrame() # Define the dataframe
+pd.set_option('display.max_colwidth', -1) #Turn off the truncating display option
 
 for section in LocalGetSections(courseid).getsections:
     dates = re.findall(r'(\d{1,2} \w{3,})', section['name'])
