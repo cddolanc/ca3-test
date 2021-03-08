@@ -73,5 +73,10 @@ for video in videos:
       video_id = video.parent.parent.parent.parent.attrs['data-id']
       vid_list_df = vid_list_df.append({'video_date' : y.group(),'video_time': z.group(),'video_name': x.group(),'video_id' : video_id},ignore_index = True)
 
+vid_list_df['video_date'] = vid_list_df['video_date'].str.replace('-0', '-')
+
+vid_list_df['video_date']= pd.to_datetime(vid_list_df.video_date, format='%Y-%m-%d')
+
+vid_list_df['Week_Number'] = vid_list_df['video_date'].dt.week
 
 print(vid_list_df)
