@@ -79,21 +79,30 @@ print(git_slides_df)
 
 
 
-# df_git_pull = pd.concat([git_index_df,git_pdf_df,git_slides_df], axis=1)
+df_git_pull = pd.concat([git_index_df,git_pdf_df,git_slides_df], axis=1)
 
 
 
 
-# print(df_git_pull)
+print(df_git_pull)
 
-s = pd.Series(["/workspace/ca3-test/wk1/index.html", "/workspace/ca3-test/wk8/index.html", "/workspace/ca3-test/wk7/index.html", "/workspace/ca3-test/wk4/index.html", "/workspace/ca3-test/wk6/index.html", "/workspace/ca3-test/wk5/index.html", "/workspace/ca3-test/wk2/index.html", "/workspace/ca3-test/wk3/index.html", "/workspace/ca3-test/wk8s/index.html"])
+# s = pd.Series(["/workspace/ca3-test/wk1/index.html", "/workspace/ca3-test/wk8/index.html", "/workspace/ca3-test/wk7/index.html", "/workspace/ca3-test/wk4/index.html", "/workspace/ca3-test/wk6/index.html", "/workspace/ca3-test/wk5/index.html", "/workspace/ca3-test/wk2/index.html", "/workspace/ca3-test/wk3/index.html", "/workspace/ca3-test/wk8s/index.html"])
 
-pattern= "[test\\\w\D\D](\D\d+\w)"
-def fetch_num(txt):
-    result = re.findall(pattern,txt)
-    if result: # if matched
-        return result[0]
-    else:
-        return txt
+# pattern= "[test\\\w\D\D](\D\d+\w)"
+# pattern='(?:wk\d+)'
+# def fetch_num(txt):
+#     result = re.findall(pattern,txt)
+#     if result: # if matched
+#         return result[0]
+#     else:
+#         return txt
 
-s.apply(fetch_num)
+# s.apply(fetch_num)
+
+# print(s)
+
+
+
+git_index_df = Index.sort_values(by = 'Name')
+
+print(git_index_df)
