@@ -72,10 +72,11 @@ for row in range(0, len(git_slides_df)):
 
 git_slides_df.sort_values(by=['week_no2'], inplace=True)	
 
-df_git_pull = pd.concat([git_index_df,git_pdf_df,git_slides_df], axis=1)
-
+df_git_pull = pd.concat([git_index_df,git_pdf_df,git_slides_df], axis=1) # pull the 3 dataframes together
 
 df_git_pull = df_git_pull.drop(columns=['week_no1','week_no2']) #drop the week columns we don't need them anymore
 df_git_pull = df_git_pull[['Index', 'PDF', 'Slides', 'week_no']] # reorder the columns
+# df_git_pull['week_no'] = df_git_pull['week_no'].str[1:].astype(int)
+df_git_pull['week_no']= df_git_pull['week_no'].str.extract('(\d+)').astype(int)
 
 print(df_git_pull)
