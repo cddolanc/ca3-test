@@ -1,3 +1,9 @@
+# pip install bs4
+# pip install lxml
+# pip install pandas
+
+
+
 import bs4
 from requests import get, post
 import json
@@ -12,6 +18,8 @@ import warnings
 import glob
 import numpy as np
 warnings.filterwarnings('ignore') # We can suppress the warnings
+pd.set_option('display.max_colwidth', -1) #Turn off the truncating display option
+
 
 # Module variables to connect to moodle api:
 # Insert token and URL for your site here.
