@@ -2,8 +2,6 @@
 # pip install lxml
 # pip install pandas
 
-
-
 import bs4
 from requests import get, post
 import json

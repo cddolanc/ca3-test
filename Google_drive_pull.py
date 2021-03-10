@@ -1,3 +1,7 @@
+# pip install bs4
+# pip install lxml
+# pip install pandas
+
 import bs4
 from requests import get, post
 import json
@@ -6,7 +10,13 @@ import datetime
 from bs4 import BeautifulSoup
 import requests
 import pandas as pd
+from pandas import DataFrame
 import re
+import warnings
+import glob
+import numpy as np
+warnings.filterwarnings('ignore') # We can suppress the warnings
+pd.set_option('display.max_colwidth', -1) #Turn off the truncating display option
 
 
 res = requests.get("https://drive.google.com/drive/folders/1pFHUrmpLv9gEJsvJYKxMdISuQuQsd_qX")
