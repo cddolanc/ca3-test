@@ -44,7 +44,7 @@ for row in range(0, len(git_index_df)):
 git_index_df.sort_values(by=['week_no'], inplace=True) # now sort by week column
 
 
-#######'PDF file list' dataframe
+#######'PDF file list' dataframe (same process as for the 'Index file list' dataframe above)
 for filename2 in glob.iglob(root_dir + '**/*.pdf', recursive=True):
     git_pdf_df = git_pdf_df.append({'PDF' : filename2},ignore_index = True)
 	
@@ -61,7 +61,7 @@ git_pdf_df.sort_values(by=['week_no1'], inplace=True)
 	
 	
 	
-#######'Slides file list' dataframe
+#######'Slides file list' dataframe (same process as for the 'Index file list' dataframe above)
 for filename3 in glob.iglob(root_dir + '**/*.md', recursive=True):
     git_slides_df = git_slides_df.append({'Slides' : filename3},ignore_index = True)
 	
@@ -76,11 +76,49 @@ for row in range(0, len(git_slides_df)):
 
 git_slides_df.sort_values(by=['week_no2'], inplace=True)	
 
+# Now we have our 3 dataframes in order we can integrate them into one and clean them up
 df_git_pull = pd.concat([git_index_df,git_pdf_df,git_slides_df], axis=1) # pull the 3 dataframes together
 
 df_git_pull = df_git_pull.drop(columns=['week_no1','week_no2']) #drop the week columns we don't need them anymore
 df_git_pull = df_git_pull[['Index', 'PDF', 'Slides', 'week_no']] # reorder the columns
-# df_git_pull['week_no'] = df_git_pull['week_no'].str[1:].astype(int)
-df_git_pull['week_no']= df_git_pull['week_no'].str.extract('(\d+)').astype(int)
+
+df_git_pull['week_no']= df_git_pull['week_no'].str.extract('(\d+)').astype(int) # drop the 'wk' string from the week column
 
 print(df_git_pull)
+
+
+# res = requests.get("http://workspace/ca3-test/wk2/index.html")#/workspace/ca3-test/wk2/index.html
+
+# print(type(res))
+
+# print(res.text)
+
+import bs4
+
+# soup = bs4.BeautifulSoup(res.text,"lxml")
+
+# print(soup)
+
+# print(soup.select('title'))
+
+
+from bs4 import BeautifulSoup
+
+# soup = BeautifulSoup(open("C:\\example.html"), "html.parser")
+
+# for city in soup.find_all('span', {'class' : 'city-sh'}):
+    # print(city)
+
+
+soup = BeautifulSoup(open("/workspace/ca3-test/wk2/index.html"), 'lxml')
+
+
+print(soup.select('title'))
+
+
+def git_title():
+    for i in df_git_pull['week_no']:
+        soup = BeautifulSoup(open(str(df_git_pull['Index'])), 'lxml')
+        print(soup.select('title'))
+
+git_title()
