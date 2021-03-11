@@ -44,6 +44,16 @@ for row in range(0, len(git_index_df)):
 git_index_df.sort_values(by=['week_no'], inplace=True) # now sort by week column
 
 
+# git_index_df['title_html'] = None # week number column for sorting
+# base_url = "https://github.com/cddolanc/ca3-test/tree/main/wk{}/index.html"
+
+# for row in range(0, len(git_index_df)):
+#     res = requests.get(base_url.format(git_index_df['week_no']))
+#     soup = bs4.BeautifulSoup(res.text,"lxml")
+#     title = soup.select('title')
+#     git_index_df = git_index_df.append({'title_html' : title},ignore_index = True)
+
+
 #######'PDF file list' dataframe (same process as for the 'Index file list' dataframe above)
 for filename2 in glob.iglob(root_dir + '**/*.pdf', recursive=True):
     git_pdf_df = git_pdf_df.append({'PDF' : filename2},ignore_index = True)
@@ -93,7 +103,7 @@ print(df_git_pull)
 
 # print(res.text)
 
-import bs4
+# import bs4
 
 # soup = bs4.BeautifulSoup(res.text,"lxml")
 
@@ -102,23 +112,83 @@ import bs4
 # print(soup.select('title'))
 
 
-from bs4 import BeautifulSoup
+# from bs4 import BeautifulSoup
 
-# soup = BeautifulSoup(open("C:\\example.html"), "html.parser")
+# # soup = BeautifulSoup(open("C:\\example.html"), "html.parser")
 
-# for city in soup.find_all('span', {'class' : 'city-sh'}):
-    # print(city)
-
-
-soup = BeautifulSoup(open("/workspace/ca3-test/wk2/index.html"), 'lxml')
+# # for city in soup.find_all('span', {'class' : 'city-sh'}):
+#     # print(city)
 
 
-print(soup.select('title'))
+# soup = BeautifulSoup(open("/workspace/ca3-test/wk2/index.html"), 'lxml')
 
 
-def git_title():
-    for i in df_git_pull['week_no']:
-        soup = BeautifulSoup(open(str(df_git_pull['Index'])), 'lxml')
-        print(soup.select('title'))
+# print(soup.select('title'))
 
-git_title()
+
+# def git_title():
+#     for i in df_git_pull['week_no']:
+#         soup = BeautifulSoup(open(str(df_git_pull['Index'])), 'lxml')
+#         print(soup.select('title'))
+
+# git_title()
+
+
+
+# res = requests.get("https://github.com/cddolanc/ca3-test/tree/main/wk1/index.html")#/workspace/ca3-test/wk2/index.html
+
+# # print(type(res))
+
+# # # print(res.text)
+
+# import bs4
+
+# soup = bs4.BeautifulSoup(res.text,"lxml")
+
+# #print(soup)
+
+# print(soup.select('title'))
+
+
+# https://github.com/cddolanc/ca3-test/tree/main/wk1
+
+
+# base_url = "https://github.com/cddolanc/ca3-test/tree/main/wk{}/index.html"
+
+# res = requests.get(base_url.format('1'))
+
+# soup = bs4.BeautifulSoup(res.text,"lxml")
+# print(soup.select(.title))
+
+
+
+# titles_html = []
+# for n in range(1,10):
+#     scrape_url = base_url.format(n)
+#     res = requests.get(scrape_url)
+#     soup = bs4.BeautifulSoup(res.text,"html")
+#     print(soup.title.text)
+
+# import requests
+# r = requests.get('https://github.com/mikhail-cct/ca3-test/blob/master/wk1/index.html')
+# import bs4
+# html = bs4.BeautifulSoup(r.text)
+# print(html.title)
+
+
+# import requests 
+# from bs4 import BeautifulSoup 
+  
+# # target url 
+# url = 'https://github.com/mikhail-cct/ca3-test/blob/master/wk1/index.html'
+  
+# # making requests instance 
+# reqs = requests.get(url) 
+  
+# # using the BeaitifulSoup module 
+# soup = BeautifulSoup(reqs.text, 'html.parser') 
+  
+# # displaying the title 
+# print("Title of the website is : ") 
+# for title in soup.find_all('title'): 
+#     print(title.get_text())
