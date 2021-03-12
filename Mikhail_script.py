@@ -1,23 +1,8 @@
-# pip install bs4
-# pip install lxml
-# pip install pandas
 
-import bs4
 from requests import get, post
 import json
 from dateutil import parser
 import datetime
-from bs4 import BeautifulSoup
-import requests
-import pandas as pd
-from pandas import DataFrame
-import re
-import warnings
-import glob
-import numpy as np
-warnings.filterwarnings('ignore') # We can suppress the warnings
-pd.set_option('display.max_colwidth', -1) #Turn off the truncating display option
-
 
 # Module variables to connect to moodle api:
 # Insert token and URL for your site here.
@@ -25,6 +10,7 @@ pd.set_option('display.max_colwidth', -1) #Turn off the truncating display optio
 KEY = "bc7ad59923ad95f17dd955868790ccb5"
 URL = "http://f0ae7213ef73.eu.ngrok.io/"
 ENDPOINT = "/webservice/rest/server.php"
+
 
 def rest_api_parameters(in_args, prefix='', out_dict=None):
     """Transform dictionary/array structure to a flat dictionary, with key names
@@ -50,6 +36,7 @@ def rest_api_parameters(in_args, prefix='', out_dict=None):
         for key, item in in_args.items():
             rest_api_parameters(item, prefix.format(key), out_dict)
     return out_dict
+
 
 def call(fname, **kwargs):
     """Calls moodle API function with function name fname and keyword arguments.
@@ -86,60 +73,39 @@ class LocalUpdateSections(object):
         self.updatesections = call(
             'local_wsmanagesections_update_sections', courseid=cid, sections=sectionsdata)
 
+################################################
+# Example
+################################################
+
 
 courseid = "2"  # Exchange with valid id.
 # Get all sections of the course.
 sec = LocalGetSections(courseid)
 
-moodle_df= pd.DataFrame() # Define the dataframe
-pd.set_option('display.max_colwidth', -1) #Turn off the truncating display option
+# Output readable JSON, but print only summary
+print(json.dumps(sec.getsections[1]['summary'], indent=4, sort_keys=True))
 
+# Split the section name by dash and convert the date into the timestamp, it takes the current year, so think of a way for making sure it has the correct year!
+month = parser.parse(list(sec.getsections)[1]['name'].split('-')[0])
+# Show the resulting timestamp
+print(month)
+# Extract the week number from the start of the calendar year
+print(month.strftime("%V"))
 
-# pull moodle sections from LocalGetSections and assemble them in seperate moodle_dataframe columns
-for section in LocalGetSections(courseid).getsections:
-    dates = re.findall('(\d{1,2} \w{3,})', section['name'])
-    summary = re.findall(r'(\d{1,2} \w{3,})', section['summary'])
-    if len(dates) == 2:
-        moodle_df= moodle_df.append({'Date' : dates, 'Link':section['summary']},ignore_index = True)
+#  Assemble the payload
+data = [{'type': 'num', 'section': 0, 'summary': '', 'summaryformat': 1, 'visible': 1 , 'highlight': 0, 'sectionformatoptions': [{'name': 'level', 'value': '1'}]}]
 
-# Clean date range data to just first date
-moodle_df["Date"] = moodle_df["Date"].str[0]
+# Assemble the correct summary
+summary = '<a href="https://mikhail-cct.github.io/ca3-test/wk1/">Week 1: Introduction</a><br>'
 
+# Assign the correct summary
+data[0]['summary'] = summary
 
-print(moodle_df)
+# Set the correct section number
+data[0]['section'] = 1
 
-# create 2 columns of number ranges for the week number to call data 
-moodle_df["year_wk_no"] = pd.DataFrame
-moodle_df["year_wk_no"] = pd.Series(range(40,68))  # googledrive year week range
-moodle_df["college_wk_no"] = pd.DataFrame
-moodle_df["college_wk_no"] = pd.Series(range(1,28)) # college year week range
+# Write the data back to Moodle
+sec_write = LocalUpdateSections(courseid, data)
 
-print(moodle_df)
-
-
-
-def google_drive_pull():
-    res = requests.get("https://drive.google.com/drive/folders/1pFHUrmpLv9gEJsvJYKxMdISuQuQsd_qX")
-    soup = bs4.BeautifulSoup(res.text,"lxml")
-    vid_list_df= pd.DataFrame(columns = ['video_date', 'video_time', 'video_name','video_id']) 
-    videos = soup.find_all('div',class_ = 'Q5txwe')
-    for video in videos:
-      video_title = video.text
-      x = re.search('P.*\.mp4', video_title)
-      y = re.search('(^\d\d\d\w.\d\d.\d\d)', video_title)
-      z = re.search('([\S]\d\d\W\d\d\W\d\d\W\d\d\W)', video_title)
-      x.group()
-      y.group()
-      z.group()
-      video_id = video.parent.parent.parent.parent.attrs['data-id']
-      vid_list_df = vid_list_df.append({'video_date' : y.group(),'video_time': z.group(),'video_name': x.group(),'video_id' : video_id},ignore_index = True)
-
-    vid_list_df['video_date'] = vid_list_df['video_date'].str.replace('-0', '-')
-
-    vid_list_df['video_date']= pd.to_datetime(vid_list_df.video_date, format='%Y-%m-%d')
-
-    vid_list_df['Week_Number'] = vid_list_df['video_date'].dt.week
-
-    print(vid_list_df)
-
-google_drive_pull()
+sec = LocalGetSections(courseid)
+print(json.dumps(sec.getsections[1]['summary'], indent=4, sort_keys=True))

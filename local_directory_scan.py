@@ -149,3 +149,19 @@ df_git_pull = df_git_pull[['Index', 'PDF', 'Slides', 'week_no']]
 # git_index_df = Index.sort_values(by = 'Name')
 
 print(df_git_pull)
+
+df_title_pull = pd.DataFrame() # Define the dataframe
+df_title_pull['title_html'] = None # week number column for sorting
+base_url = "https://github.com/cddolanc/ca3-test/tree/main/wk{}/index.html"
+week_no = df_git_pull.columns.get_loc('week_no')
+df_git_pull.iat[row, week_no] =week
+for row in range(0, len(df_git_pull)):
+    week_no = df_git_pull.columns.get_loc('week_no')
+    df_git_pull.iat[row, week_no] =week
+    res = requests.get(base_url.format(week))
+    soup = bs4.BeautifulSoup(res.text,"lxml")
+    title = soup.select('title')
+    print(title)
+    # df_title_pull = df_title_pull.append({'title_html' : title},ignore_index = True)
+
+    print(df_title_pull)
