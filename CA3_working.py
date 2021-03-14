@@ -188,7 +188,7 @@ def google_drive_pull():
         print(summary)
         
     # Set the correct section number 
-        data[0]['section'] = i
+        data[0]['section'] = i=1
         
 
     # Write the data back to Moodle
