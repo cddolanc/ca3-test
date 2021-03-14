@@ -91,23 +91,6 @@ courseid = "2"  # Exchange with valid id.
 # Get all sections of the course.
 sec = LocalGetSections(courseid)
 
-# #  Assemble the payload
-# data = [{'type': 'num', 'section': 0, 'summary': '', 'summaryformat': 1, 'visible': 1 , 'highlight': 0, 'sectionformatoptions': [{'name': 'level', 'value': '1'}]}]
-
-# # Assemble the correct summary
-# summary = '<a href="https://mikhail-cct.github.io/ca3-test/wk1/">Week 1: Introduction</a><br>'
-
-# # Assign the correct summary
-# data[0]['summary'] = summary
-
-# # Set the correct section number
-# data[0]['section'] = 1
-
-# # Write the data back to Moodle
-# sec_write = LocalUpdateSections(courseid, data)
-
-# sec = LocalGetSections(courseid)
-
 
 def pull_from_moodle():
     moodle_df= pd.DataFrame() # Define the dataframe
@@ -116,16 +99,14 @@ def pull_from_moodle():
 
     # pull moodle sections from LocalGetSections and assemble them in seperate moodle_dataframe columns
     for section in LocalGetSections(courseid).getsections:
-        dates = re.findall('(\d{1,2} \w{3,})', section['name'])
-        summary = re.findall(r'(\d{1,2} \w{3,})', section['summary'])
+        dates = re.findall('(\d{1,2} \w{3,})', section['name'])  # get the dates from the name section
+        summary = re.findall(r'(\d{1,2} \w{3,})', section['summary'])  # get summary from summary section
         if len(dates) == 2:
-            moodle_df= moodle_df.append({'Date' : dates, 'Link':section['summary']},ignore_index = True)
+            moodle_df= moodle_df.append({'Date' : dates, 'Link':section['summary']},ignore_index = True)  # assign each section pulled into dataframe columns
 
     # Clean date range data to just first date
     moodle_df["Date"] = moodle_df["Date"].str[0]
 
-
-    # print(moodle_df)
 
     # create 2 columns of number ranges for the week number to call data 
     moodle_df["year_wk_no"] = pd.DataFrame
@@ -135,7 +116,7 @@ def pull_from_moodle():
 
     print(moodle_df)
 
-pull_from_moodle()
+# pull_from_moodle()
 
 def google_drive_pull():
     res = requests.get("https://drive.google.com/drive/folders/1pFHUrmpLv9gEJsvJYKxMdISuQuQsd_qX")
@@ -168,21 +149,131 @@ def google_drive_pull():
     vid_list_df = vid_list_df.drop(vid_list_df.columns[[0, 1, 2]], axis=1)
 
     
-# path_ends
+
     cols = list(vid_list_df.columns.values)
-    
+
     vid_list_df = vid_list_df[['Week_Number', 'url', 'desc']]
     vid_list_df.insert(3, 'path_ends', '</a><br>')
-    
+ 
     vid_list_df["college_wk_no"] = pd.Series(range(1,28))
 
     
+
+
     for i in  range(len(vid_list_df["college_wk_no"])):
+    # for row in vid_list_df["college_wk_no"]:
+        data = [{'type': 'num', 'section': 0, 'summary': '', 'summaryformat': 1, 'visible': 1 , 'highlight': 0, 'sectionformatoptions': [{'name': 'level', 'value': '1'}]}]
+    
+    # Assemble the correct summary
+        
+        summary = vid_list_df.iloc[i, 1] + vid_list_df.iloc[i, 2] + vid_list_df.iloc[i, 3]
+        
+        data[0]['summary'] = summary
+        print(summary)
+        
+    # Set the correct section number 
+        data[0]['section'] = i+1
+        
+
+    # Write the data back to Moodle
+        sec_write = LocalUpdateSections(courseid, data)
+
+        sec = LocalGetSections(courseid)
+
+    print(vid_list_df)
+
+
+
+
+    print(vid_list_df)
+
+
+# google_drive_pull()
+
+
+def local_files():
+    ## Local direcory file scan and assemble dataframe:
+
+    ## First create 3 dataframes for each filetype
+    git_index_df = pd.DataFrame() # Define the 'Index file list' dataframe
+    git_pdf_df = pd.DataFrame() # Define the 'PDF file list' dataframe
+    git_slides_df = pd.DataFrame() # Define the 'Slides file list' dataframe
+
+    #######'Index file list' dataframe
+    root_dir = "/workspace/ca3-test/" # Don't forget trailing (last) slashes    
+    for filename in glob.iglob(root_dir + '**/*index.html', recursive=True):
+        git_index_df = git_index_df.append({'Index' : filename},ignore_index = True)
+        
+    git_index_df['week_no'] = None # week number column for sorting
+    # find directories with 'wk' followed by a number and put it in the week column
+    index_Index = git_index_df.columns.get_loc('Index')
+    index_week_no = git_index_df.columns.get_loc('week_no')
+    pattern=r'(?:wk\d+)'
+    for row in range(0, len(git_index_df)):
+        week = re.search(pattern, git_index_df.iat[row, index_Index]).group()
+        git_index_df.iat[row, index_week_no] =week
+        
+    git_index_df.sort_values(by=['week_no'], inplace=True) # now sort by week column
+
+
+    #######'PDF file list' dataframe (same process as for the 'Index file list' dataframe above)
+    for filename2 in glob.iglob(root_dir + '**/*.pdf', recursive=True):
+        git_pdf_df = git_pdf_df.append({'PDF' : filename2},ignore_index = True)
+        
+    git_pdf_df['week_no1'] = None
+
+    index_PDF = git_pdf_df.columns.get_loc('PDF')
+    index_week_no1 = git_pdf_df.columns.get_loc('week_no1')
+    pattern=r'(?:wk\d+)'
+    for row in range(0, len(git_pdf_df)):
+        week1 = re.search(pattern, git_pdf_df.iat[row, index_PDF]).group()
+        git_pdf_df.iat[row, index_week_no1] =week1
+
+    git_pdf_df.sort_values(by=['week_no1'], inplace=True)
+        
+        
+        
+    #######'Slides file list' dataframe (same process as for the 'Index file list' dataframe above)
+    for filename3 in glob.iglob(root_dir + '**/*.md', recursive=True):
+        git_slides_df = git_slides_df.append({'Slides' : filename3},ignore_index = True)
+        
+    git_slides_df['week_no2'] = None
+
+    index_Slides = git_slides_df.columns.get_loc('Slides')
+    index_week_no2 = git_slides_df.columns.get_loc('week_no2')
+    pattern=r'(?:wk\d+)'
+    for row in range(0, len(git_slides_df)):
+        week2 = re.search(pattern, git_slides_df.iat[row, index_Slides]).group()
+        git_slides_df.iat[row, index_week_no2] =week2
+
+    git_slides_df.sort_values(by=['week_no2'], inplace=True)	
+
+    # Now we have our 3 dataframes in order we can integrate them into one and clean them up
+    df_git_pull = pd.concat([git_index_df,git_pdf_df,git_slides_df], axis=1) # pull the 3 dataframes together
+
+    df_git_pull = df_git_pull.drop(columns=['week_no1','week_no2']) #drop the week columns we don't need them anymore
+    df_git_pull = df_git_pull[['Index', 'PDF', 'Slides', 'week_no']] # reorder the columns
+
+    df_git_pull['week_no']= df_git_pull['week_no'].str.extract('(\d+)').astype(str) # drop the 'wk' string from the week column
+
+
+
+    print(df_git_pull)
+
+    df_git_pull.insert(4, 'header', '<a href="https://github.com/cddolanc/ca3-test/tree/main/wk')  # Header for html link
+    df_git_pull.insert(5, 'path_HTML', '/index.html">HTML_link</a><br>')  # tail for htnl link
+    df_git_pull.insert(6, 'path_pdf', '">PDF_link</a><br>') # tail for link pdf link
+    df_git_pull.insert(7, 'path_md', '">PDF_Slides</a><br>') # tail for pdf slide (not currently working)
+# .astype(str)
+
+
+    print(df_git_pull)
+    for i in  range(len(df_git_pull['Index'])):
     
         data = [{'type': 'num', 'section': 0, 'summary': '', 'summaryformat': 1, 'visible': 1 , 'highlight': 0, 'sectionformatoptions': [{'name': 'level', 'value': '1'}]}]
     
     # Assemble the correct summary
-        summary = vid_list_df.iloc[i, 1] + vid_list_df.iloc[i, 2] + vid_list_df.iloc[i, 3]
+        summary = df_git_pull.iloc[i, 4] + df_git_pull.iloc[i, 3] + df_git_pull.iloc[i, 5] + df_git_pull.iloc[i, 4] + df_git_pull.iloc[i, 3] + df_git_pull.iloc[i, 6] + df_git_pull.iloc[i, 4] + df_git_pull.iloc[i, 3] + df_git_pull.iloc[i, 7]
         
         data[0]['summary'] = summary
         print(summary)
@@ -196,7 +287,10 @@ def google_drive_pull():
 
         sec = LocalGetSections(courseid)
 
-    print(vid_list_df)
+    print(df_git_pull)
 
 
-google_drive_pull()
+pull_from_moodle()
+# google_drive_pull()
+# local_files()
+# pull_from_moodle()
