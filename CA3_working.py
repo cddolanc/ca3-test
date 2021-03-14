@@ -292,5 +292,5 @@ def local_files():
 
 pull_from_moodle()
 # google_drive_pull()
-# local_files()
-# pull_from_moodle()
+local_files()
+pull_from_moodle()
