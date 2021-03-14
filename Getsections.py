@@ -139,7 +139,11 @@ def google_drive_pull():
     vid_list_df['video_date']= pd.to_datetime(vid_list_df.video_date, format='%Y-%m-%d')
 
     vid_list_df['Week_Number'] = vid_list_df['video_date'].dt.week
+    vid_list_df["desc"] = (vid_list_df["video_date"].astype(str) + vid_list_df["video_time"].astype(str) + vid_list_df["video_name"].astype(str))
+    vid_list_df = vid_list_df.drop(vid_list_df.columns[[0, 1, 2]], axis=1) 
 
+    vid_list_df.insert(0, 'path', '<a href="https://drive.google.com/file/d/')
+    vid_list_df.insert(2, 'path_end', '">')
     print(vid_list_df)
 
 google_drive_pull()
