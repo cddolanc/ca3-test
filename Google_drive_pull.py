@@ -68,7 +68,7 @@ soup = bs4.BeautifulSoup(res.text,"lxml")
 # print(vid_list_df)
 
 
-vid_list_df= pd.DataFrame(columns = ['video_date', 'video_time', 'video_name','video_id', 'uploaded']) 
+vid_list_df= pd.DataFrame(columns = ['video_date', 'video_time', 'video_name','video_id']) 
 videos = soup.find_all('div',class_ = 'Q5txwe')
 
 print(len(videos))
@@ -88,5 +88,15 @@ vid_list_df['video_date'] = vid_list_df['video_date'].str.replace('-0', '-')
 vid_list_df['video_date']= pd.to_datetime(vid_list_df.video_date, format='%Y-%m-%d')
 
 vid_list_df['Week_Number'] = vid_list_df['video_date'].dt.week
+
+vid_list_df.insert(3, 'path', '<a href="https://drive.google.com/file/d/')
+vid_list_df.insert(5, 'path_end', '">')
+vid_list_df["url"] = vid_list_df["path"] + vid_list_df["video_id"] + vid_list_df["path_end"]
+# vid_list_df.drop(columns=["path_end"])
+vid_list_df["desc"] = (vid_list_df["video_date"].astype(str) + vid_list_df["video_time"].astype(str) + vid_list_df["video_name"].astype(str))
+vid_list_df.reset_index(drop=True)
+vid_list_df = vid_list_df.drop(vid_list_df.columns[[0, 1, 2]], axis=1) 
+# vid_list_df.insert(4, 'path1', '<a href="')
+# vid_list_df.insert(4, 'path2', '</a><br>')
 
 print(vid_list_df)

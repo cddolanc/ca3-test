@@ -168,41 +168,22 @@ def google_drive_pull():
     vid_list_df = vid_list_df.drop(vid_list_df.columns[[0, 1, 2]], axis=1)
 
     
-    # vid_list_df.insert(2, 'path_ends', '</a><br>')
-    # vid_list_df["description_full"] = (vid_list_df["desc"].astype(str) + vid_list_df["path_ends"].astype(str))
-    # vid_list_df = vid_list_df.drop(vid_list_df.columns[[2]], axis=1)
 # path_ends
     cols = list(vid_list_df.columns.values)
-    # print(vid_list_df)
-    # print(cols)
+    
     vid_list_df = vid_list_df[['Week_Number', 'url', 'desc']]
     vid_list_df.insert(3, 'path_ends', '</a><br>')
-    # vid_list_df.insert(4, range(1, len(git_pdf_df)
+    
     vid_list_df["college_wk_no"] = pd.Series(range(1,28))
 
-    #  Assemble the payload
-    # data = [{'type': 'num', 'section': 0, 'summary': '', 'summaryformat': 1, 'visible': 1 , 'highlight': 0, 'sectionformatoptions': [{'name': 'level', 'value': '1'}]}]
-    # i = (vid_list_df["college_wk_no"])
-
-
-    # summary = vid_list_df["url"] + vid_list_df["desc"] + vid_list_df['path_ends']
-    # i = vid_list_df["college_wk_no"]
-    # for i in range(len(df)) : 
-    # print(df.iloc[i, 1], df.iloc[i, 2]) 
-
-
-    # data[0]['summary'] = summary
-    # for row in vid_list_df:
-    # for row in vid_list_df.iterrows():
+    
     for i in  range(len(vid_list_df["college_wk_no"])):
-    # for row in vid_list_df["college_wk_no"]:
+    
         data = [{'type': 'num', 'section': 0, 'summary': '', 'summaryformat': 1, 'visible': 1 , 'highlight': 0, 'sectionformatoptions': [{'name': 'level', 'value': '1'}]}]
     
     # Assemble the correct summary
-        # summary = vid_list_df["url"] + vid_list_df["desc"] + vid_list_df['path_ends']
-
         summary = vid_list_df.iloc[i, 1] + vid_list_df.iloc[i, 2] + vid_list_df.iloc[i, 3]
-        # summary = (row["url"])+(row["desc"])+(row['path_ends'])
+        
         data[0]['summary'] = summary
         print(summary)
         
