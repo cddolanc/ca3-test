@@ -91,32 +91,51 @@ courseid = "2"  # Exchange with valid id.
 # Get all sections of the course.
 sec = LocalGetSections(courseid)
 
-moodle_df= pd.DataFrame() # Define the dataframe
-pd.set_option('display.max_colwidth', -1) #Turn off the truncating display option
+#  Assemble the payload
+data = [{'type': 'num', 'section': 0, 'summary': '', 'summaryformat': 1, 'visible': 1 , 'highlight': 0, 'sectionformatoptions': [{'name': 'level', 'value': '1'}]}]
+
+# Assemble the correct summary
+summary = '<a href="https://mikhail-cct.github.io/ca3-test/wk1/">Week 1: Introduction</a><br>'
+
+# Assign the correct summary
+data[0]['summary'] = summary
+
+# Set the correct section number
+data[0]['section'] = 1
+
+# Write the data back to Moodle
+sec_write = LocalUpdateSections(courseid, data)
+
+sec = LocalGetSections(courseid)
 
 
-# pull moodle sections from LocalGetSections and assemble them in seperate moodle_dataframe columns
-for section in LocalGetSections(courseid).getsections:
-    dates = re.findall('(\d{1,2} \w{3,})', section['name'])
-    summary = re.findall(r'(\d{1,2} \w{3,})', section['summary'])
-    if len(dates) == 2:
-        moodle_df= moodle_df.append({'Date' : dates, 'Link':section['summary']},ignore_index = True)
-
-# Clean date range data to just first date
-moodle_df["Date"] = moodle_df["Date"].str[0]
+def pull_from_moodle():
+    moodle_df= pd.DataFrame() # Define the dataframe
+    pd.set_option('display.max_colwidth', -1) #Turn off the truncating display option
 
 
-print(moodle_df)
+    # pull moodle sections from LocalGetSections and assemble them in seperate moodle_dataframe columns
+    for section in LocalGetSections(courseid).getsections:
+        dates = re.findall('(\d{1,2} \w{3,})', section['name'])
+        summary = re.findall(r'(\d{1,2} \w{3,})', section['summary'])
+        if len(dates) == 2:
+            moodle_df= moodle_df.append({'Date' : dates, 'Link':section['summary']},ignore_index = True)
 
-# create 2 columns of number ranges for the week number to call data 
-moodle_df["year_wk_no"] = pd.DataFrame
-moodle_df["year_wk_no"] = pd.Series(range(40,68))  # googledrive year week range
-moodle_df["college_wk_no"] = pd.DataFrame
-moodle_df["college_wk_no"] = pd.Series(range(1,28)) # college year week range
-
-print(moodle_df)
+    # Clean date range data to just first date
+    moodle_df["Date"] = moodle_df["Date"].str[0]
 
 
+    # print(moodle_df)
+
+    # create 2 columns of number ranges for the week number to call data 
+    moodle_df["year_wk_no"] = pd.DataFrame
+    moodle_df["year_wk_no"] = pd.Series(range(40,68))  # googledrive year week range
+    moodle_df["college_wk_no"] = pd.DataFrame
+    moodle_df["college_wk_no"] = pd.Series(range(1,28)) # college year week range
+
+    print(moodle_df)
+
+pull_from_moodle()
 
 def google_drive_pull():
     res = requests.get("https://drive.google.com/drive/folders/1pFHUrmpLv9gEJsvJYKxMdISuQuQsd_qX")
@@ -144,6 +163,40 @@ def google_drive_pull():
 
     vid_list_df.insert(0, 'path', '<a href="https://drive.google.com/file/d/')
     vid_list_df.insert(2, 'path_end', '">')
+
+    vid_list_df["url"] = (vid_list_df["path"].astype(str) + vid_list_df["video_id"].astype(str) + vid_list_df["path_end"].astype(str))
+    vid_list_df = vid_list_df.drop(vid_list_df.columns[[0, 1, 2]], axis=1)
+
+    
+    # vid_list_df.insert(2, 'path_ends', '</a><br>')
+    # vid_list_df["description_full"] = (vid_list_df["desc"].astype(str) + vid_list_df["path_ends"].astype(str))
+    # vid_list_df = vid_list_df.drop(vid_list_df.columns[[2]], axis=1)
+# path_ends
+    cols = list(vid_list_df.columns.values)
+    # print(vid_list_df)
+    # print(cols)
+    vid_list_df = vid_list_df[['Week_Number', 'url', 'desc']]
+    vid_list_df.insert(3, 'path_ends', '</a><br>')
+    # vid_list_df.insert(4, range(1, len(git_pdf_df)
+    vid_list_df["college_wk_no"] = pd.Series(range(1,28))
+
+    #  Assemble the payload
+    data = [{'type': 'num', 'section': 0, 'summary': '', 'summaryformat': 1, 'visible': 1 , 'highlight': 0, 'sectionformatoptions': [{'name': 'level', 'value': '1'}]}]
+
+    # Assemble the correct summary
+    summary = vid_list_df["url"] + vid_list_df["desc"] + vid_list_df['path_ends']
+    # Assign the correct summary
+    data[0]['summary'] = summary
+
+    # Set the correct section number
+    data[0]['section'] = 1
+
+    # Write the data back to Moodle
+    sec_write = LocalUpdateSections(courseid, data)
+
+    sec = LocalGetSections(courseid)
+
     print(vid_list_df)
+
 
 google_drive_pull()
